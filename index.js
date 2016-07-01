@@ -46,22 +46,22 @@ function lookup(pattern, options) {
   if (isGlob(pattern)) {
     return matchFile(cwd, pattern, options);
   } else {
-    return findFile(cwd, pattern);
+    return findFile(cwd, pattern, (process.platform === 'linux'));
   }
 }
 
 function matchFile(cwd, pattern, opts) {
   var isMatch = mm.matcher(pattern, opts);
-  var files = fs.readdirSync(cwd);
-  var len = files.length;
-  var idx = -1;
-
-  while (++idx < len) {
-    var name = files[idx];
+  var files = tryReaddirSync(cwd);
+  var res = match(files, function(name) {
     var fp = path.join(cwd, name);
     if (isMatch(name) || isMatch(fp)) {
       return fp;
     }
+  });
+
+  if (res) {
+    return res;
   }
 
   var dir = path.dirname(cwd);
@@ -71,9 +71,9 @@ function matchFile(cwd, pattern, opts) {
   return matchFile(dir, pattern, opts);
 }
 
-function findFile(cwd, filename) {
-  var fp = cwd ? path.resolve(cwd, filename) : filename;
-  if (exists(fp)) {
+function findFile(cwd, filename, strict) {
+  var fp = find(cwd, filename, strict);
+  if (fp) {
     return fp;
   }
 
@@ -82,10 +82,47 @@ function findFile(cwd, filename) {
 
   while (len--) {
     cwd = segs.slice(0, len).join(path.sep);
-    fp = path.resolve(cwd, filename);
-    if (exists(fp)) {
+    fp = find(cwd, filename, strict);
+    if (fp) {
       return fp;
     }
   }
   return null;
+}
+
+function find(cwd, filename, strict) {
+  var fp = cwd ? path.resolve(cwd, filename) : filename;
+  if (exists(fp)) {
+    return fp;
+  }
+  if (strict !== true) {
+    return;
+  }
+
+  var files = tryReaddirSync(cwd);
+  return match(files, function(name) {
+    var res = path.resolve(cwd, name);
+    if (res === fp) {
+      return res;
+    }
+  });
+}
+
+function match(files, fn) {
+  var len = files.length;
+  var idx = -1;
+  while (++idx < len) {
+    var name = files[idx];
+    var res = fn(name);
+    if (res) {
+      return res;
+    }
+  }
+}
+
+function tryReaddirSync(fp) {
+  try {
+    return fs.readdirSync(fp);
+  } catch(err) {}
+  return [];
 }
