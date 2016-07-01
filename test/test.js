@@ -60,7 +60,7 @@ describe('findup-sync', function () {
     var expected = path.resolve(__dirname, 'fixtures/a/b/Mochafile.txt');
     var restore = chdir(path.resolve(__dirname, 'fixtures/a/b/c/d/e/f/g/h'));
 
-    var actual = findup('a/b/Mochafile.txt');
+    var actual = findup('a/b/mochafile.txt');
     assert(actual);
     assert(exists(actual));
     assert.equal(actual, expected);
@@ -89,7 +89,7 @@ describe('findup-sync', function () {
     var expectedA = path.resolve(__dirname, 'fixtures/a/a.txt');
     var tempDir = chdir(path.resolve(__dirname, 'fixtures'));
 
-    var actualFile = findup('a/b/Mochafile.txt', {cwd: 'a/b/c/d'});
+    var actualFile = findup('a/b/mochafile.txt', {cwd: 'a/b/c/d'});
     assert(actualFile);
     assert(exists(actualFile));
     assert.equal(actualFile, expectedFile);
@@ -124,7 +124,7 @@ describe('findup-sync', function () {
   });
 
   it('should support normal (non-glob) case sensitive file paths:', function () {
-    actual = findup('c/Mochafile.txt', {cwd: 'test/fixtures/a/b/c/d/e/f/g'});
+    actual = findup('c/mochafile.txt', {cwd: 'test/fixtures/a/b/c/d/e/f/g'});
     assert.basename(actual, 'Mochafile.txt');
     assert.dirname(actual, 'test/fixtures/a/b/c');
   });
@@ -162,19 +162,19 @@ describe('findup-sync', function () {
   });
 
   it('should support case sensitive glob patterns', function() {
-    assert.equal(normalize(findup('**/c/Mochafile.txt', {cwd: 'test/fixtures/a/b/c/d/e/f/g'})), 'test/fixtures/a/b/c/Mochafile.txt');
+    assert.equal(normalize(findup('**/c/mochafile.txt', {cwd: 'test/fixtures/a/b/c/d/e/f/g'})), 'test/fixtures/a/b/c/Mochafile.txt');
     assert.equal(normalize(findup('**/one.txt', {cwd: 'test/fixtures/a/b/c/d/e/f/g'})), 'test/fixtures/a/b/c/d/one.txt');
     assert.equal(normalize(findup('**/two.txt', {cwd: 'test/fixtures/a/b/c/d/e/f/g'})), 'test/fixtures/a/b/c/two.txt');
 
-    assert.equal(normalize(findup('Mocha*', {cwd: 'test/fixtures/a/b/c'})), 'test/fixtures/a/b/c/Mochafile.txt');
+    assert.equal(normalize(findup('mocha*', {cwd: 'test/fixtures/a/b/c'})), 'test/fixtures/a/b/c/Mochafile.txt');
 
     var opts = {cwd: 'test/fixtures/a/b/c/d/e/f/g'};
 
-    actual = findup('**/c/Mochafile.txt', opts);
+    actual = findup('**/c/mochafile.txt', opts);
     assert.dirname(actual, 'test/fixtures/a/b/c');
     assert.basename(actual, 'Mochafile.txt');
 
-    actual = findup('c/Mochafile.txt', opts);
+    actual = findup('c/mochafile.txt', opts);
     assert.dirname(actual, 'test/fixtures/a/b/c');
     assert.basename(actual, 'Mochafile.txt');
 
