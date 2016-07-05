@@ -56,12 +56,42 @@ describe('findup-sync', function () {
     restore();
   });
 
+  it('should find case sensitive files in a child directory', function () {
+    var basename = process.platform === 'linux' ? 'Mochafile.txt' : 'mochafile.txt';
+    var expected = path.resolve(__dirname, 'fixtures/a/b/', basename);
+    var restore = chdir(path.resolve(__dirname, 'fixtures/a/b/c/d/e/f/g/h'));
+
+    var actual = findup('a/b/mochafile.txt');
+    assert(actual);
+    assert(exists(actual));
+    assert.equal(actual, expected);
+    restore();
+  });
+
   it('should find files in a child directory relative to a cwd', function () {
     var expectedFile = path.resolve(__dirname, 'fixtures/a/b/file.txt');
     var expectedA = path.resolve(__dirname, 'fixtures/a/a.txt');
     var tempDir = chdir(path.resolve(__dirname, 'fixtures'));
 
     var actualFile = findup('a/b/file.txt', {cwd: 'a/b/c/d'});
+    assert(actualFile);
+    assert(exists(actualFile));
+    assert.equal(actualFile, expectedFile);
+
+    var actualA = findup('a.txt', {cwd: 'a/b/c/d/e/f'});
+    assert(actualA);
+    assert(exists(actualA));
+    assert.equal(actualA, expectedA);
+    tempDir();
+  });
+
+  it('should find case sensitive files in a child directory relative to a cwd', function () {
+    var basename = process.platform === 'linux' ? 'Mochafile.txt' : 'mochafile.txt';
+    var expectedFile = path.resolve(__dirname, 'fixtures/a/b', basename);
+    var expectedA = path.resolve(__dirname, 'fixtures/a/a.txt');
+    var tempDir = chdir(path.resolve(__dirname, 'fixtures'));
+
+    var actualFile = findup('a/b/mochafile.txt', {cwd: 'a/b/c/d'});
     assert(actualFile);
     assert(exists(actualFile));
     assert.equal(actualFile, expectedFile);
@@ -95,6 +125,13 @@ describe('findup-sync', function () {
     assert.basename(actual, 'package.json');
   });
 
+  it('should support normal (non-glob) case sensitive file paths:', function () {
+    var basename = process.platform === 'linux' ? 'Mochafile.txt' : 'mochafile.txt';
+    actual = findup('c/mochafile.txt', {cwd: 'test/fixtures/a/b/c/d/e/f/g'});
+    assert.basename(actual, basename);
+    assert.dirname(actual, 'test/fixtures/a/b/c');
+  });
+
   it('should support glob patterns', function() {
     assert.equal(normalize(findup('**/c/package.json', {cwd: 'test/fixtures/a/b/c/d/e/f/g'})), 'test/fixtures/a/b/c/package.json');
     assert.equal(normalize(findup('**/one.txt', {cwd: 'test/fixtures/a/b/c/d/e/f/g'})), 'test/fixtures/a/b/c/d/one.txt');
@@ -125,6 +162,34 @@ describe('findup-sync', function () {
     actual = findup('p*.json', {cwd: cwd});
     assert.dirname(actual, cwd);
     assert.basename(actual, 'package.json');
+  });
+
+  it('should support case sensitive glob patterns', function() {
+    var basename = process.platform === 'linux' ? 'Mochafile.txt' : 'mochafile.txt';
+    assert.equal(normalize(findup('**/c/mochafile.txt', {cwd: 'test/fixtures/a/b/c/d/e/f/g', nocase: true})), 'test/fixtures/a/b/c/Mochafile.txt');
+    assert.equal(normalize(findup('**/one.txt', {cwd: 'test/fixtures/a/b/c/d/e/f/g', nocase: true})), 'test/fixtures/a/b/c/d/one.txt');
+    assert.equal(normalize(findup('**/two.txt', {cwd: 'test/fixtures/a/b/c/d/e/f/g', nocase: true})), 'test/fixtures/a/b/c/two.txt');
+
+    assert.equal(normalize(findup('mocha*', {cwd: 'test/fixtures/a/b/c', nocase: true})), 'test/fixtures/a/b/c/Mochafile.txt');
+
+    var opts = {cwd: 'test/fixtures/a/b/c/d/e/f/g', nocase: true};
+
+    actual = findup('**/c/mochafile.txt', opts);
+    assert.dirname(actual, 'test/fixtures/a/b/c');
+    assert.basename(actual, 'Mochafile.txt');
+
+    actual = findup('c/mochafile.txt', opts);
+    assert.dirname(actual, 'test/fixtures/a/b/c');
+    assert.basename(actual, basename);
+
+    opts.nocase = false;
+    actual = findup('**/ONE.txt', opts);
+    assert.dirname(actual, 'test/fixtures/a/b/c');
+    assert.basename(actual, 'ONE.txt');
+
+    actual = findup('**/two.txt', opts);
+    assert.dirname(actual, 'test/fixtures/a/b/c');
+    assert.basename(actual, 'two.txt');
   });
 
   it('should support arrays of glob patterns', function() {

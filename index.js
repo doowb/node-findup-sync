@@ -8,7 +8,8 @@ var fs = require('fs');
 var path = require('path');
 var isGlob = require('is-glob');
 var resolveDir = require('resolve-dir');
-var exists = require('fs-exists-sync');
+// var exists = require('fs-exists-sync');
+var exists = require('./utils').exists;
 var mm = require('micromatch');
 
 /**
@@ -52,7 +53,7 @@ function lookup(pattern, options) {
 
 function matchFile(cwd, pattern, opts) {
   var isMatch = mm.matcher(pattern, opts);
-  var files = fs.readdirSync(cwd);
+  var files = tryReaddirSync(cwd);
   var len = files.length;
   var idx = -1;
 
@@ -72,9 +73,10 @@ function matchFile(cwd, pattern, opts) {
 }
 
 function findFile(cwd, filename) {
+  var res = null;
   var fp = cwd ? path.resolve(cwd, filename) : filename;
-  if (exists(fp)) {
-    return fp;
+  if (res = exists(fp)) {
+    return res;
   }
 
   var segs = cwd.split(path.sep);
@@ -83,9 +85,16 @@ function findFile(cwd, filename) {
   while (len--) {
     cwd = segs.slice(0, len).join(path.sep);
     fp = path.resolve(cwd, filename);
-    if (exists(fp)) {
-      return fp;
+    if (res = exists(fp)) {
+      return res;
     }
   }
   return null;
+}
+
+function tryReaddirSync(fp) {
+  try {
+    return fs.readdirSync(fp);
+  } catch(err) {}
+  return [];
 }
