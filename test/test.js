@@ -57,7 +57,8 @@ describe('findup-sync', function () {
   });
 
   it('should find case sensitive files in a child directory', function () {
-    var expected = path.resolve(__dirname, 'fixtures/a/b/Mochafile.txt');
+    var basename = process.platform === 'linux' ? 'Mochafile.txt' : 'mochafile.txt';
+    var expected = path.resolve(__dirname, 'fixtures/a/b/', basename);
     var restore = chdir(path.resolve(__dirname, 'fixtures/a/b/c/d/e/f/g/h'));
 
     var actual = findup('a/b/mochafile.txt');
@@ -85,7 +86,8 @@ describe('findup-sync', function () {
   });
 
   it('should find case sensitive files in a child directory relative to a cwd', function () {
-    var expectedFile = path.resolve(__dirname, 'fixtures/a/b/Mochafile.txt');
+    var basename = process.platform === 'linux' ? 'Mochafile.txt' : 'mochafile.txt';
+    var expectedFile = path.resolve(__dirname, 'fixtures/a/b', basename);
     var expectedA = path.resolve(__dirname, 'fixtures/a/a.txt');
     var tempDir = chdir(path.resolve(__dirname, 'fixtures'));
 
@@ -124,8 +126,9 @@ describe('findup-sync', function () {
   });
 
   it('should support normal (non-glob) case sensitive file paths:', function () {
+    var basename = process.platform === 'linux' ? 'Mochafile.txt' : 'mochafile.txt';
     actual = findup('c/mochafile.txt', {cwd: 'test/fixtures/a/b/c/d/e/f/g'});
-    assert.basename(actual, 'Mochafile.txt');
+    assert.basename(actual, basename);
     assert.dirname(actual, 'test/fixtures/a/b/c');
   });
 
@@ -162,13 +165,14 @@ describe('findup-sync', function () {
   });
 
   it('should support case sensitive glob patterns', function() {
-    assert.equal(normalize(findup('**/c/mochafile.txt', {cwd: 'test/fixtures/a/b/c/d/e/f/g'})), 'test/fixtures/a/b/c/Mochafile.txt');
-    assert.equal(normalize(findup('**/one.txt', {cwd: 'test/fixtures/a/b/c/d/e/f/g'})), 'test/fixtures/a/b/c/d/one.txt');
-    assert.equal(normalize(findup('**/two.txt', {cwd: 'test/fixtures/a/b/c/d/e/f/g'})), 'test/fixtures/a/b/c/two.txt');
+    var basename = process.platform === 'linux' ? 'Mochafile.txt' : 'mochafile.txt';
+    assert.equal(normalize(findup('**/c/mochafile.txt', {cwd: 'test/fixtures/a/b/c/d/e/f/g', nocase: true})), 'test/fixtures/a/b/c/Mochafile.txt');
+    assert.equal(normalize(findup('**/one.txt', {cwd: 'test/fixtures/a/b/c/d/e/f/g', nocase: true})), 'test/fixtures/a/b/c/d/one.txt');
+    assert.equal(normalize(findup('**/two.txt', {cwd: 'test/fixtures/a/b/c/d/e/f/g', nocase: true})), 'test/fixtures/a/b/c/two.txt');
 
-    assert.equal(normalize(findup('mocha*', {cwd: 'test/fixtures/a/b/c'})), 'test/fixtures/a/b/c/Mochafile.txt');
+    assert.equal(normalize(findup('mocha*', {cwd: 'test/fixtures/a/b/c', nocase: true})), 'test/fixtures/a/b/c/Mochafile.txt');
 
-    var opts = {cwd: 'test/fixtures/a/b/c/d/e/f/g'};
+    var opts = {cwd: 'test/fixtures/a/b/c/d/e/f/g', nocase: true};
 
     actual = findup('**/c/mochafile.txt', opts);
     assert.dirname(actual, 'test/fixtures/a/b/c');
@@ -176,8 +180,9 @@ describe('findup-sync', function () {
 
     actual = findup('c/mochafile.txt', opts);
     assert.dirname(actual, 'test/fixtures/a/b/c');
-    assert.basename(actual, 'Mochafile.txt');
+    assert.basename(actual, basename);
 
+    opts.nocase = false;
     actual = findup('**/ONE.txt', opts);
     assert.dirname(actual, 'test/fixtures/a/b/c');
     assert.basename(actual, 'ONE.txt');
