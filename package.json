@@ -20,7 +20,7 @@
     "test": "grunt && mocha"
   },
   "dependencies": {
-    "fs-exists-sync": "github:doowb/fs-exists-sync",
+    "detect-file": "^0.1.0",
     "is-glob": "^2.0.1",
     "micromatch": "^2.3.7",
     "resolve-dir": "^0.1.0"
