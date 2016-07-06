@@ -26,6 +26,7 @@
     "resolve-dir": "^0.1.0"
   },
   "devDependencies": {
+    "fs-exists-sync": "^0.1.0",
     "grunt": "^1.0.1",
     "grunt-contrib-jshint": "^0.12.0",
     "is-absolute": "^0.2.3",
