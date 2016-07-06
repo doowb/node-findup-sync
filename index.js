@@ -8,8 +8,7 @@ var fs = require('fs');
 var path = require('path');
 var isGlob = require('is-glob');
 var resolveDir = require('resolve-dir');
-// var exists = require('fs-exists-sync');
-var exists = require('./utils').exists;
+var exists = require('fs-exists-sync');
 var mm = require('micromatch');
 
 /**
