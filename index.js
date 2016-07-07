@@ -71,11 +71,7 @@ function matchFile(cwd, pattern, opts) {
   return matchFile(dir, pattern, opts);
 }
 
-function findFile(cwd, filename) {
-  var options = {
-    nocase: (process.platform !== 'win32')
-  };
-
+function findFile(cwd, filename, options) {
   var res;
   var fp = cwd ? path.resolve(cwd, filename) : filename;
   if (res = detect(fp, options)) {

@@ -61,7 +61,7 @@ describe('findup-sync', function () {
     var expected = path.resolve(__dirname, 'fixtures/a/b/', (isLinux ? 'Mochafile.txt' : 'mochafile.txt'));
     var restore = chdir(path.resolve(__dirname, 'fixtures/a/b/c/d/e/f/g/h'));
 
-    var actual = findup('a/b/mochafile.txt');
+    var actual = findup('a/b/mochafile.txt', {nocase: true});
     assert(actual);
     assert(exists(actual));
     assert.equal(actual, expected);
@@ -90,7 +90,7 @@ describe('findup-sync', function () {
     var expectedA = path.resolve(__dirname, 'fixtures/a/a.txt');
     var tempDir = chdir(path.resolve(__dirname, 'fixtures'));
 
-    var actualFile = findup('a/b/mochafile.txt', {cwd: 'a/b/c/d'});
+    var actualFile = findup('a/b/mochafile.txt', {cwd: 'a/b/c/d', nocase: true});
     assert(actualFile);
     assert(exists(actualFile));
     assert.equal(actualFile, expectedFile);
@@ -125,7 +125,7 @@ describe('findup-sync', function () {
   });
 
   it('should support normal (non-glob) case sensitive file paths:', function () {
-    actual = findup('c/mochafile.txt', {cwd: 'test/fixtures/a/b/c/d/e/f/g'});
+    actual = findup('c/mochafile.txt', {cwd: 'test/fixtures/a/b/c/d/e/f/g', nocase: true});
     assert.basename(actual, (isLinux ? 'Mochafile.txt' : 'mochafile.txt'));
     assert.dirname(actual, 'test/fixtures/a/b/c');
   });
